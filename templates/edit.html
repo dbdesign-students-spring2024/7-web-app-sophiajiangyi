@@ -4,11 +4,15 @@
 <form method="POST" action="{{ url_for('edit_post', mongoid=mongoid) }}">
   <p>
     Your name:
-    <input type="text" id="fname" name="fname" value="{{doc.name}}" /><br />
+    <input type="text" id="fname" name="fname" required value="{{doc.name}}" /><br />
   </p>
   <p>
-    Message:
-    <textarea id="fmessage" name="fmessage">{{doc.message}}</textarea>
+    Expense amount:
+    <input type="number" id="famount" name="famount" step="0.01" required value="{{doc.amount}}" /><br />
+  </p>
+  <p>
+    Memo:
+    <textarea id="fmemo" name="fmemo">{{doc.memo}}</textarea>
   </p>
   <p>
     <a href="{{ url_for('read')}}">Cancel</a>

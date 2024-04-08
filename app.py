@@ -79,10 +79,42 @@ def read():
     Route for GET requests to the read page.
     Displays some information for the user with links to other pages.
     """
-    docs = db.exampleapp.find({}).sort(
-        "created_at", -1
-    )  # sort in descending order of created_at timestamp
-    return render_template("read.html", docs=docs)  # render the read template
+    sort_field = request.args.get('sort', 'created_at')  # Default sort is by 'created_at'
+    sort_order = request.args.get('order', 'desc')  # Default order is descending
+    search_query = request.args.get('search', '')
+
+    next_order = 'asc' if sort_order == 'desc' else 'desc'
+    mongo_sort_order = -1 if sort_order == 'desc' else 1
+
+    query = {"name": {"$regex": search_query, "$options": "i"}} if search_query else {}
+    
+    # Execute the query with sorting
+    docs = db.exampleapp.find(query).sort(sort_field, mongo_sort_order)
+
+    # Calculate the sum of amounts for the filtered search results
+    if search_query:  # Apply search filter to aggregation as well
+        aggregate_filter = [{"$match": query}]
+    else:
+        aggregate_filter = []
+
+    aggregate_filter.append({
+        "$group": {
+            "_id": None,
+            "total_amount": {"$sum": "$amount"}
+        }
+    })
+
+    total_amount_result = list(db.exampleapp.aggregate(aggregate_filter))
+    total_amount = total_amount_result[0]['total_amount'] if total_amount_result else 0
+    
+    return render_template(
+        "read.html",
+        docs=docs,
+        next_order=next_order,
+        sort_field=sort_field,
+        search_query=search_query,
+        total_amount=total_amount
+    )
 
 
 @app.route("/create")
@@ -101,10 +133,11 @@ def create_post():
     Accepts the form submission data for a new document and saves the document to the database.
     """
     name = request.form["fname"]
-    message = request.form["fmessage"]
+    amount = float(request.form["famount"])
+    memo = request.form["fmemo"]
 
     # create a new document with the data the user entered
-    doc = {"name": name, "message": message, "created_at": datetime.datetime.utcnow()}
+    doc = {"name": name, "amount": amount, "memo": memo, "created_at": datetime.datetime.utcnow()}
     db.exampleapp.insert_one(doc)  # insert a new document
 
     return redirect(
@@ -137,12 +170,14 @@ def edit_post(mongoid):
     mongoid (str): The MongoDB ObjectId of the record to be edited.
     """
     name = request.form["fname"]
-    message = request.form["fmessage"]
+    amount = float(request.form["famount"])
+    memo = request.form["fmemo"]
 
     doc = {
         # "_id": ObjectId(mongoid),
         "name": name,
-        "message": message,
+        "amount": amount,
+        "memo": memo,
         "created_at": datetime.datetime.utcnow(),
     }
 
@@ -191,11 +226,11 @@ def webhook():
 
 
 @app.errorhandler(Exception)
-def handle_error(e):
+def handle_error(err):
     """
     Output any errors - good for debugging.
     """
-    return render_template("error.html", error=e)  # render the edit template
+    return render_template("error.html", error=err)  # render the edit template
 
 
 # run the app

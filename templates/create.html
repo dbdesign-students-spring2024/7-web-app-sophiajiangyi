@@ -1,11 +1,16 @@
 {% extends 'base.html' %} {% block container %}
 <h2>Create</h2>
-<p>Create a new record in the MongoDB database collection.</p>
+<p>Create a new spending record in the MongoDB database collection.</p>
 <form method="POST" action="{{ url_for('create_post') }}">
-  <p>Your name: <input type="text" id="fname" name="fname" /><br /></p>
   <p>
-    Message:
-    <textarea type="text" id="fmessage" name="fmessage"></textarea>
+    Your name: <input type="text" id="fname" name="fname" required /><br />
+  </p>
+  <p>
+    Expense amount: <input type="number" id="famount" name="famount" step="0.01" required /><br />
+  </p>
+  <p>
+    Memo:
+    <textarea id="fmemo" name="fmemo"></textarea>
   </p>
   <p>
     <a href="{{ url_for('read')}}">Cancel</a>
