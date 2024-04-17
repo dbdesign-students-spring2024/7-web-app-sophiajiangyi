@@ -78,17 +78,28 @@ def read():
 
 @app.route("/create", methods=["GET", "POST"])
 def create():
+    """
+    Route for GET and POST requests to the create page.
+    Creates new recipe.
+    """
     if request.method == "POST":
+        navigation = request.form.get('navigation', 'next')
         step = request.form.get('step', '1')
-        # Saving form data into session to persist user choices across steps
-        session['base'] = request.form.get('base', session.get('base', ''))
-        session['flavor'] = request.form.get('flavor', session.get('flavor', ''))
-        session['nutrition'] = request.form.get('nutrition', session.get('nutrition', ''))
-        session['texture'] = request.form.get('texture', session.get('texture', ''))
-        session['name'] = request.form.get('name', session.get('name', ''))
+        
+        if navigation == 'next':
+            step = str(int(step) + 1)
+        else:  # Handle 'prev' navigation
+            step = str(int(step) - 1)
+        
+        # Updating session data only if moving forward
+        if navigation == 'next':
+            session['base'] = request.form.get('base', session.get('base', ''))
+            session['flavor'] = request.form.get('flavor', session.get('flavor', ''))
+            session['nutrition'] = request.form.get('nutrition', session.get('nutrition', ''))
+            session['texture'] = request.form.get('texture', session.get('texture', ''))
+            session['name'] = request.form.get('name', session.get('name', ''))
 
-        if step == '5':
-            # Final step: save data to database and redirect
+        if step == '6':  # After final step
             doc = {
                 "base": session['base'],
                 "flavor": session['flavor'],
@@ -101,7 +112,7 @@ def create():
             session.clear()  # Clear the session after saving to DB
             return redirect(url_for("read"))
         else:
-            return redirect(url_for("create", step=str(int(step) + 1)))
+            return redirect(url_for("create", step=step))
 
     step = request.args.get('step', '1')
     return render_template(f"create_step{step}.html", data=session)

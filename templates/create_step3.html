@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% block container %}
 <h2>Step 3: Boost Your Nutrition</h2>
+<p>Current Mix: {{ data.base }} base with {{ data.flavor }} flavor and __ nutrition and a __ texture.</p>
 <form method="POST" action="{{ url_for('create') }}">
   <input type="hidden" name="step" value="3">
+  <input type="hidden" name="navigation" value="next">
   <p>Boost your nutrition:
     <select name="nutrition" required>
       <option value="Vitamin A">Vitamin A</option>
@@ -10,6 +12,9 @@
       <!-- Add more options as needed -->
     </select>
   </p>
-  <p><input type="submit" value="Next"></p>
+  <p>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='prev';">Previous</button>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='next';">Next</button>
+  </p>
 </form>
 {% endblock %}
