@@ -5,13 +5,7 @@ import sys
 import subprocess
 import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, make_response
-
-# import logging
-# import sentry_sdk
-# from sentry_sdk.integrations.flask import (
-#     FlaskIntegration,
-# )  # delete this if not using sentry.io
+from flask import Flask, session, render_template, request, redirect, url_for, make_response
 
 # from markupsafe import escape
 import pymongo
@@ -19,31 +13,13 @@ from pymongo.errors import ConnectionFailure
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
 
-# load credentials and configuration options from .env file
-# if you do not yet have a file named .env, make one based on the template in env.example
 load_dotenv(override=True)  # take environment variables from .env.
 
-# initialize Sentry for help debugging... this requires an account on sentrio.io
-# you will need to set the SENTRY_DSN environment variable to the value provided by Sentry
-# delete this if not using sentry.io
-# sentry_sdk.init(
-#     dsn=os.getenv("SENTRY_DSN"),
-#     # enable_tracing=True,
-#     # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
-#     traces_sample_rate=1.0,
-#     # Set profiles_sample_rate to 1.0 to profile 100% of sampled transactions.
-#     # We recommend adjusting this value in production.
-#     profiles_sample_rate=1.0,
-#     integrations=[FlaskIntegration()],
-#     traces_sample_rate=1.0,
-#     send_default_pii=True,
-# )
-
-# instantiate the app using sentry for debugging
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_KEY")  # Needed for session management
 
 # # turn on debugging if in development mode
-# app.debug = True if os.getenv("FLASK_ENV", "development") == "development" else False
+app.debug = True if os.getenv("FLASK_ENV", "development") == "development" else False
 
 # try to connect to the database, and quit if it doesn't work
 try:
@@ -91,58 +67,44 @@ def read():
     # Execute the query with sorting
     docs = db.exampleapp.find(query).sort(sort_field, mongo_sort_order)
 
-    # Calculate the sum of amounts for the filtered search results
-    if search_query:  # Apply search filter to aggregation as well
-        aggregate_filter = [{"$match": query}]
-    else:
-        aggregate_filter = []
-
-    aggregate_filter.append({
-        "$group": {
-            "_id": None,
-            "total_amount": {"$sum": "$amount"}
-        }
-    })
-
-    total_amount_result = list(db.exampleapp.aggregate(aggregate_filter))
-    total_amount = total_amount_result[0]['total_amount'] if total_amount_result else 0
-    
     return render_template(
         "read.html",
         docs=docs,
         next_order=next_order,
         sort_field=sort_field,
-        search_query=search_query,
-        total_amount=total_amount
+        search_query=search_query
     )
 
 
-@app.route("/create")
+@app.route("/create", methods=["GET", "POST"])
 def create():
-    """
-    Route for GET requests to the create page.
-    Displays a form users can fill out to create a new document.
-    """
-    return render_template("create.html")  # render the create template
+    if request.method == "POST":
+        step = request.form.get('step', '1')
+        # Saving form data into session to persist user choices across steps
+        session['base'] = request.form.get('base', session.get('base', ''))
+        session['flavor'] = request.form.get('flavor', session.get('flavor', ''))
+        session['nutrition'] = request.form.get('nutrition', session.get('nutrition', ''))
+        session['texture'] = request.form.get('texture', session.get('texture', ''))
+        session['name'] = request.form.get('name', session.get('name', ''))
 
+        if step == '5':
+            # Final step: save data to database and redirect
+            doc = {
+                "base": session['base'],
+                "flavor": session['flavor'],
+                "nutrition": session['nutrition'],
+                "texture": session['texture'],
+                "name": session['name'],
+                "created_at": datetime.datetime.utcnow()
+            }
+            db.exampleapp.insert_one(doc)  # insert a new document
+            session.clear()  # Clear the session after saving to DB
+            return redirect(url_for("read"))
+        else:
+            return redirect(url_for("create", step=str(int(step) + 1)))
 
-@app.route("/create", methods=["POST"])
-def create_post():
-    """
-    Route for POST requests to the create page.
-    Accepts the form submission data for a new document and saves the document to the database.
-    """
-    name = request.form["fname"]
-    amount = float(request.form["famount"])
-    memo = request.form["fmemo"]
-
-    # create a new document with the data the user entered
-    doc = {"name": name, "amount": amount, "memo": memo, "created_at": datetime.datetime.utcnow()}
-    db.exampleapp.insert_one(doc)  # insert a new document
-
-    return redirect(
-        url_for("read")
-    )  # tell the browser to make a request for the /read route
+    step = request.args.get('step', '1')
+    return render_template(f"create_step{step}.html", data=session)
 
 
 @app.route("/edit/<mongoid>")

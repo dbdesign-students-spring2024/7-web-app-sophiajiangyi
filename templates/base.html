@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Spending Memo App</title>
+    <title>TailorProtein Studio</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -10,11 +10,11 @@
   <body>
     <div class="container">
       <header>
-        <h1>Spending Memo App</h1>
+        <h1>TailorProtein Studio</h1>
         <p>
           <a href="{{ url_for('home')}}">Home</a> |
-          <a href="{{ url_for('read')}}">All posts</a> |
-          <a href="{{ url_for('create')}}">Create a post</a>
+          <a href="{{ url_for('read')}}">All mixes</a> |
+          <a href="{{ url_for('create')}}">Create a mix!</a>
         </p>
       </header>
       <main>{% block container %} {% endblock %}</main>

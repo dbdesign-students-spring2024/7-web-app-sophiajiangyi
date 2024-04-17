@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block container %}
+<h2>Step 3: Boost Your Nutrition</h2>
+<form method="POST" action="{{ url_for('create') }}">
+  <input type="hidden" name="step" value="3">
+  <p>Boost your nutrition:
+    <select name="nutrition" required>
+      <option value="Vitamin A">Vitamin A</option>
+      <option value="Vitamin B">Vitamin B</option>
+      <!-- Add more options as needed -->
+    </select>
+  </p>
+  <p><input type="submit" value="Next"></p>
+</form>
+{% endblock %}

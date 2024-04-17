@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block container %}
+<h2>Step 5: Design Your Label</h2>
+<form method="POST" action="{{ url_for('create') }}">
+  <input type="hidden" name="step" value="5">
+  <p>Design your label:
+    <input type="text" name="name" required>
+  </p>
+  <p><input type="submit" value="Finish"></p>
+</form>
+{% endblock %}

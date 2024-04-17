@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block container %}
+<h2>Step 2: Flavor It Up</h2>
+<form method="POST" action="{{ url_for('create') }}">
+  <input type="hidden" name="step" value="2">
+  <p>Flavor it up:
+    <select name="flavor" required>
+      <option value="Chocolate">Chocolate</option>
+      <option value="Mango">Mango</option>
+      <!-- Add more options as needed -->
+    </select>
+  </p>
+  <p><input type="submit" value="Next"></p>
+</form>
+{% endblock %}

@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
 
 {% block container %}
-<h2>Read</h2>
-<p>This page shows information pulled from a MongoDB database collection.</p>
-
-<!-- Total Amount -->
-<p>Total Amount: {{ total_amount }}</p>
+<h2>All mixes</h2>
+<p>Check out what the community is cooking!</p>
 
 <!-- Search Form -->
 <form action="{{ url_for('read') }}" method="get">
@@ -15,20 +12,19 @@
 
 <!-- Sorting Buttons -->
 <a href="{{ url_for('read', sort='name', order=next_order, search=search_query) }}">Sort by Name</a>
-<a href="{{ url_for('read', sort='amount', order=next_order, search=search_query) }}">Sort by Amount</a>
 <a href="{{ url_for('read', sort='created_at', order=next_order, search=search_query) }}">Sort by Created Time</a>
 
     {% for doc in docs %}
     <div>
         <hr class="solid">
         <p class="post">
-            Posted by {{doc.name}} at {{ doc.created_at.strftime("%H:%M on %d %B %Y") }}
+            {{doc.name}} | Mixed at {{ doc.created_at.strftime("%H:%M on %d %B %Y") }}
             <br/>
             <a href="{{ url_for('edit',mongoid=doc._id)}}">Edit</a> | <a href="{{ url_for('delete',mongoid=doc._id)}}">Delete</a>
             <br/>
         </p>
         <p>
-            {{ doc.amount|string ~ " " ~ doc.memo }}
+            {{ doc.base ~ " base with " ~ doc.flavor ~ " flavor boosted by " ~ doc.nutrition ~ " with a " ~ doc.texture ~ " texture." }}
         </p>
             
     </div>
