@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block container %}
-<h2>Step 1: Choose Your Base</h2>
-<p>Current Mix: __ base with __ flavor and __ nutrition and a __ texture.</p>
-<form method="POST" action="{{ url_for('create') }}">
+<h2>Edit Step 1: Choose Your Base</h2>
+<p>Original Mix: {{ old_data.base }} base with {{ old_data.flavor }} flavor and {{old_data.nutrition}} and a {{ old_data.texture }} texture.</p>
+<p>New Mix: __ base with __ flavor and __ nutrition and a __ texture.</p>
+<form method="POST" action="{{ url_for('edit', mongoid=mongoid, step=1) }}">
   <input type="hidden" name="step" value="1">
   <p>Choose your base:
     <select name="base" required>

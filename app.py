@@ -118,49 +118,58 @@ def create():
     return render_template(f"create_step{step}.html", data=session)
 
 
-@app.route("/edit/<mongoid>")
+# @app.route("/edit/<mongoid>", methods=["GET"])
+# def edit(mongoid):
+#     """
+#     Initialize the editing process by loading the document and storing its data in the session.
+#     """
+#     doc = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
+#     session['edit_data'] = doc  # Store the document data in the session
+#     return redirect(url_for("edit_step", mongoid=mongoid, step=1))
+
+@app.route("/edit/<mongoid>", methods=["GET", "POST"])
 def edit(mongoid):
     """
-    Route for GET requests to the edit page.
-    Displays a form users can fill out to edit an existing record.
-
-    Parameters:
-    mongoid (str): The MongoDB ObjectId of the record to be edited.
+    Handle each step of the edit process.
     """
-    doc = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
-    return render_template(
-        "edit.html", mongoid=mongoid, doc=doc
-    )  # render the edit template
+    if request.method == "POST":
+        navigation = request.form.get('navigation', 'next')
+        step = request.form.get('step', '1')
+        
+        if navigation == 'next':
+            step = str(int(step) + 1)
+        else:  # Handle 'prev' navigation
+            step = str(int(step) - 1)
+        
+        # Updating session data only if moving forward
+        if navigation == 'next':
+            session['base'] = request.form.get('base', session.get('base', ''))
+            session['flavor'] = request.form.get('flavor', session.get('flavor', ''))
+            session['nutrition'] = request.form.get('nutrition', session.get('nutrition', ''))
+            session['texture'] = request.form.get('texture', session.get('texture', ''))
+            session['name'] = request.form.get('name', session.get('name', ''))
 
+        if step == '6':  # After final step
+            doc = {
+                "base": session['base'],
+                "flavor": session['flavor'],
+                "nutrition": session['nutrition'],
+                "texture": session['texture'],
+                "name": session['name'],
+                "created_at": datetime.datetime.utcnow()
+            }
+            # Update the database with the new data
+            db.exampleapp.update_one(
+                {"_id": ObjectId(mongoid)}, {"$set": doc}
+            )
+            session.clear()  # Clear the session after saving to DB
+            return redirect(url_for("read"))
+        else:
+            return redirect(url_for("edit", step=step, mongoid=mongoid))
 
-@app.route("/edit/<mongoid>", methods=["POST"])
-def edit_post(mongoid):
-    """
-    Route for POST requests to the edit page.
-    Accepts the form submission data for the specified document and updates the document in the database.
-
-    Parameters:
-    mongoid (str): The MongoDB ObjectId of the record to be edited.
-    """
-    name = request.form["fname"]
-    amount = float(request.form["famount"])
-    memo = request.form["fmemo"]
-
-    doc = {
-        # "_id": ObjectId(mongoid),
-        "name": name,
-        "amount": amount,
-        "memo": memo,
-        "created_at": datetime.datetime.utcnow(),
-    }
-
-    db.exampleapp.update_one(
-        {"_id": ObjectId(mongoid)}, {"$set": doc}  # match criteria
-    )
-
-    return redirect(
-        url_for("read")
-    )  # tell the browser to make a request for the /read route
+    step = request.args.get('step', '1')
+    old_data = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
+    return render_template(f"edit_step{step}.html", old_data=old_data, data=session, mongoid=mongoid)
 
 
 @app.route("/delete/<mongoid>")

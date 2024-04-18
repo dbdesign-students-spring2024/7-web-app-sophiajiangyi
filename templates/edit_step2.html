@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block container %}
+<h2>Edit Step 2: Flavor It Up</h2>
+<p>Original Mix: {{ old_data.base }} base with {{ old_data.flavor }} flavor and {{old_data.nutrition}} and a {{ old_data.texture }} texture.</p>
+<p>New Mix: {{ data.base }} base with __ flavor and __ nutrition and a __ texture.</p>
+<form method="POST" action="{{ url_for('edit', mongoid=mongoid, step=2) }}">
+  <input type="hidden" name="step" value="2">
+  <input type="hidden" name="navigation" value="next">
+  <p>Flavor it up:
+    <select name="flavor" required>
+      <option value="Chocolate">Chocolate</option>
+      <option value="Mango">Mango</option>
+      <!-- Add more options as needed -->
+    </select>
+  </p>
+  <p>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='prev';">Previous</button>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='next';">Next</button>
+  </p>
+</form>
+{% endblock %}

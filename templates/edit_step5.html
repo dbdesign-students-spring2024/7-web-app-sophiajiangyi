@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block container %}
+<h2>Edit Step 5: Design Your Label</h2>
+<p>Original Mix: {{ old_data.base }} base with {{ old_data.flavor }} flavor and {{old_data.nutrition}} and a {{ old_data.texture }} texture.</p>
+<p>New Mix: {{ data.base }} base with {{ data.flavor }} flavor and {{data.nutrition}} and a {{ data.texture }} texture.</p>
+<form method="POST" action="{{ url_for('edit', mongoid=mongoid, step=5) }}">
+  <input type="hidden" name="step" value="5">
+  <input type="hidden" name="navigation" value="next">
+  <p>Design your label:
+    <input type="text" name="name" required value="{{ old_data.name }}">
+  </p>
+  <p>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='prev';">Previous</button>
+    <button type="submit" onclick="document.getElementsByName('navigation')[0].value='next';">Finish</button>
+  </p>
+</form>
+{% endblock %}
