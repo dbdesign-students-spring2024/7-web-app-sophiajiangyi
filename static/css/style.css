@@ -1,25 +1,128 @@
-.container {
-  border: 2px solid;
-  width: 50%;
-  margin: 0 auto;
+/* Add a nice font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+/* Style dropdowns/select elements */
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-header,
-footer,
-main {
+/* Style focus state */
+select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+
+/* Style input fields */
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Style submit buttons */
+input[type="submit"],
+button {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+input[type="submit"]:hover,
+button:hover {
+  background-color: #45a049;
+}
+
+/* Style for the button that is not a submit type, for example a regular action button */
+button.action-button {
+  background-color: #f44336;
+}
+
+button.action-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Add some more styling to the forms if you have them */
+form {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+
+body, h1, p {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.container {
+  border: none;
+  width: 80%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+header, main, footer {
   padding: 20px;
 }
 
-header,
-main {
-  border-bottom: 2px solid;
-  margin-bottom: 5px;
+header, main {
+  border-bottom: none;
 }
 
-p.post {
-  font-size: 12px;
+a {
+  text-decoration: none;
+  color: #007bff;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+p {
+  color: #666;
+  line-height: 1.6;
 }
 
 footer {
-  margin-bottom: 5px;
+  background-color: #f1f1f1;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+  }
 }

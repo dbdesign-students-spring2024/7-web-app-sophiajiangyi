@@ -65,7 +65,7 @@ def read():
     query = {"name": {"$regex": search_query, "$options": "i"}} if search_query else {}
     
     # Execute the query with sorting
-    docs = db.exampleapp.find(query).sort(sort_field, mongo_sort_order)
+    docs = db.mixes.find(query).sort(sort_field, mongo_sort_order)
 
     return render_template(
         "read.html",
@@ -108,7 +108,7 @@ def create():
                 "name": session['name'],
                 "created_at": datetime.datetime.utcnow()
             }
-            db.exampleapp.insert_one(doc)  # insert a new document
+            db.mixes.insert_one(doc)  # insert a new document
             session.clear()  # Clear the session after saving to DB
             return redirect(url_for("read"))
         else:
@@ -123,7 +123,7 @@ def create():
 #     """
 #     Initialize the editing process by loading the document and storing its data in the session.
 #     """
-#     doc = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
+#     doc = db.mixes.find_one({"_id": ObjectId(mongoid)})
 #     session['edit_data'] = doc  # Store the document data in the session
 #     return redirect(url_for("edit_step", mongoid=mongoid, step=1))
 
@@ -159,7 +159,7 @@ def edit(mongoid):
                 "created_at": datetime.datetime.utcnow()
             }
             # Update the database with the new data
-            db.exampleapp.update_one(
+            db.mixes.update_one(
                 {"_id": ObjectId(mongoid)}, {"$set": doc}
             )
             session.clear()  # Clear the session after saving to DB
@@ -168,7 +168,7 @@ def edit(mongoid):
             return redirect(url_for("edit", step=step, mongoid=mongoid))
 
     step = request.args.get('step', '1')
-    old_data = db.exampleapp.find_one({"_id": ObjectId(mongoid)})
+    old_data = db.mixes.find_one({"_id": ObjectId(mongoid)})
     return render_template(f"edit_step{step}.html", old_data=old_data, data=session, mongoid=mongoid)
 
 
@@ -181,7 +181,7 @@ def delete(mongoid):
     Parameters:
     mongoid (str): The MongoDB ObjectId of the record to be deleted.
     """
-    db.exampleapp.delete_one({"_id": ObjectId(mongoid)})
+    db.mixes.delete_one({"_id": ObjectId(mongoid)})
     return redirect(
         url_for("read")
     )  # tell the web browser to make a request for the /read route.
